@@ -43,13 +43,23 @@ class TeamController extends Controller
         $user_role_owner->role_id = $role_id_owner->id;
         $user_role_owner->team_id = $team->id;
         $user_role_owner->save();
-
+    }
+    public function update(Request $request, $id){
+        $data = [
+            'title' => $request->get('title'),
+        ];
+        $rules = [
+            'title' => 'required',
+        ];
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
+        Team::where('id', $id)->update($data);
         $user_role_member = new  UserRole();
         $user_role_member->user_id = $request->member_id;
         $role_id_member = Role::find(2);
         $user_role_member->role_id = $role_id_member->id;
-        $user_role_member->team_id = $team->id;
         $user_role_member->save();
-
     }
 }
