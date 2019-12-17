@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Role;
 use App\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\Console\Input\Input;
 
 class UserController extends Controller
 {
@@ -32,7 +35,12 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
-            $data->roles();
-           User::create($data);
+//        dd($roles);
+        $user = new User();
+        $user['name'] = $data['name'];
+        $user['mail'] = $data['mail'];
+//        $roles = Role::all();
+//        dd($roles);
+        $user->save();
     }
 }
