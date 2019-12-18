@@ -29,8 +29,12 @@ class Team extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var array
      */
-    public function roles() {
-        return $this->belongsTo('App\Role');
+
+    public function users() {
+        return $this->belongsToMany('App\User','user_role_teams','team_id','user_id');
+    }
+    public function role() {
+        return $this->belongsToMany('App\Role','user_role_teams','team_id','role_id');
     }
 
 }

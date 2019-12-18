@@ -30,11 +30,11 @@ class Role extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
 
-    public function users(){
-        return $this->belongsTo('App\User');
+    public function team() {
+        return $this->belongsToMany('App\Team','user_role_teams','role_id','team_id');
     }
-    public function teams(){
-        return $this->belongsTo('App\Team');
+    public function user() {
+        return $this->belongsToMany('App\User','user_role_teams','role_id','user_id');
     }
 
 }

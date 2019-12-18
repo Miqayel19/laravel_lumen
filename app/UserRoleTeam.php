@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 
-class UserRole extends Model implements AuthenticatableContract, AuthorizableContract
+class UserRoleTeam extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
 
@@ -18,18 +18,20 @@ class UserRole extends Model implements AuthenticatableContract, AuthorizableCon
      *
      * @var array
      */
-    public $table = "role_user";
-    public $timestamps = false;
+        protected $table = 'user_role_teams';
 
     protected $fillable = [
         'user_id','role_id','team_id'
     ];
+
+    public $timestamps = false;
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
+
 
 
 }

@@ -32,7 +32,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password',
     ];
 
-    public function roles() {
-        return $this->belongsTo('App\Role');
+    public function team() {
+        return $this->belongsToMany('App\Team','user_role_teams','user_id','team_id');
+    }
+    public function role() {
+        return $this->belongsToMany('App\Role','user_role_teams','user_id', 'role_id');
     }
 }

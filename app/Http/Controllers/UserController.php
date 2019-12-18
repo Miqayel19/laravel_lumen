@@ -21,11 +21,19 @@ class UserController extends Controller
         //
     }
 
+
+    public function show($id){
+
+        $user = User::with('team')->where('id',$id)->get();
+        echo "<pre>";
+        print_r($user);
+    }
+
     public function add(Request $request){
 
         $data = [
             'name' => $request['name'],
-            'mail' => $request['mail']
+            'mail' => $request['mail'],
         ];
         $rules = [
             'name' =>'required',
@@ -39,8 +47,7 @@ class UserController extends Controller
         $user = new User();
         $user['name'] = $data['name'];
         $user['mail'] = $data['mail'];
-//        $roles = Role::all();
-//        dd($roles);
+
         $user->save();
     }
 }
