@@ -18,7 +18,7 @@ $router->get('users','UserController@index');
 $router->post('user','UserController@add');
 $router->get('user/{id}','UserController@show');
 
-$router->get('teams','TeamController@index');
+$router->get('team/{id}','TeamController@index');
 $router->post('team','TeamController@add');
 $router->put('team/{id}','TeamController@update');
 

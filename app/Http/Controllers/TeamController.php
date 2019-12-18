@@ -71,4 +71,8 @@ class TeamController extends Controller
         $user_role_member->team_id = $id;
         $user_role_member->save();
     }
+    public function index($id){
+        $team =  Team::where('id',$id)->get();
+        return response()->json($team);
+    }
 }
