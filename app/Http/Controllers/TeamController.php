@@ -39,17 +39,14 @@ class TeamController extends Controller
         }
         $team = Team::create($data);
         $role_id_owner = Role::find(1); // Owner
-//        dd($role_id_owner);
-//        dd($team->id);
+
         $user_role_owner = new  UserRoleTeam();
-//        $user_role_owner->user_id = Auth::user()->id;
         $user_role_owner->user_id = $request->owner_id;
-//        dd($team->roles());
-//        $team->roles()->attach($role_id_owner);
         $user_role_owner->role_id = $role_id_owner->id;
         $user_role_owner->team_id = $team->id;
 
         $user_role_owner->save();
+        return response()->json(['created' => true],201);
     }
     public function update(Request $request, $id){
         $data = [
@@ -70,6 +67,8 @@ class TeamController extends Controller
         $user_role_member->role_id = $role_id_member->id;
         $user_role_member->team_id = $id;
         $user_role_member->save();
+
+        return response()->json(['updated' => true],201);
     }
     public function index($id){
         $team =  Team::where('id',$id)->get();

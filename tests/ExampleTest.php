@@ -10,12 +10,22 @@ class ExampleTest extends TestCase
      *
      * @return void
      */
-    public function testExample()
+//    public function testExample()
+//    {
+//        $this->get('/');
+//
+//        $this->assertEquals(
+//            $this->app->version(), $this->response->getContent()
+//        );
+//    }
+    public function testBasicExample()
     {
-        $this->get('/');
+        $response = $this->json('POST', '/user', [
+            'name' => 'Sallydfdsf',
+            'mail' => 'asdasd@km.ru'
+        ]);
+        $response->seeJson(['created' => true]);
 
-        $this->assertEquals(
-            $this->app->version(), $this->response->getContent()
-        );
+
     }
 }

@@ -43,11 +43,11 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
-//        dd($roles);
         $user = new User();
         $user['name'] = $data['name'];
         $user['mail'] = $data['mail'];
 
         $user->save();
+        return response()->json(['created' => true],201);
     }
 }
