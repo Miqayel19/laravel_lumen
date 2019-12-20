@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\Team;
-use Illuminate\Support\Facades\Auth;
 
 use App\UserRoleTeam;
 use Illuminate\Http\Request;
@@ -54,7 +53,7 @@ class TeamController extends Controller
         ];
 
         $rules = [
-            'title' => 'required|unique:teams',
+            'title' => 'required|',
         ];
         $validator = Validator::make($data, $rules);
         if ($validator->fails()) {
@@ -68,10 +67,10 @@ class TeamController extends Controller
         $user_role_member->team_id = $id;
         $user_role_member->save();
 
-        return response()->json(['updated' => true],201);
+        return response()->json(['update_team' => true],201);
     }
     public function index($id){
         $team =  Team::where('id',$id)->get();
-        return response()->json($team);
+        return response()->json(['get_team'=>true]);
     }
 }

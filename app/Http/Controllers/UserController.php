@@ -25,8 +25,7 @@ class UserController extends Controller
     public function show($id){
 
         $user = User::with('team')->where('id',$id)->get();
-        echo "<pre>";
-        print_r($user);
+        return response()->json(['showed user' => true],201);
     }
 
     public function add(Request $request){

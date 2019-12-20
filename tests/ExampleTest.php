@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
+
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class ExampleTest extends TestCase
@@ -10,22 +11,38 @@ class ExampleTest extends TestCase
      *
      * @return void
      */
-//    public function testExample()
-//    {
-//        $this->get('/');
-//
-//        $this->assertEquals(
-//            $this->app->version(), $this->response->getContent()
-//        );
-//    }
-    public function testBasicExample()
-    {
+    use DatabaseMigrations;
+
+    public function testAddUser(){
+
         $response = $this->json('POST', '/user', [
-            'name' => 'Sallydfdsf',
-            'mail' => 'asdasd@km.ru'
+            'name' => 'new',
+            'mail' => 'new@mail.ru'
         ]);
         $response->seeJson(['created' => true]);
-
-
     }
+    public function testAddTeam(){
+        $response = $this->json('POST', '/team', [
+            'title' => 'Carolina',
+            'owner_id' => '1'
+        ]);
+        $response->seeJson(['created' => true]);
+    }
+    public function testGetUserWithTeam(){
+        $response = $this->json('GET', '/show/1');
+        $response->seeJson(['showed_user' => true]);
+    }
+    public function testGetTeam(){
+        $response = $this->json('GET', '/team/1');
+        $response->seeJson(['get_team' => true]);
+    }
+    public function testUpdateTeam(){
+        $response = $this->json('PUT', '/team/1',[
+            'title'=>'asasas',
+            'member_id'=>'2'
+        ]);
+        $response->seeJson(['update_team' => true]);
+    }
+
+
 }
