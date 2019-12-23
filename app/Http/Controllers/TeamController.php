@@ -45,7 +45,7 @@ class TeamController extends Controller
         $user_role_owner->team_id = $team->id;
 
         $user_role_owner->save();
-        return response()->json(['created' => true],201);
+        return response()->json(['created' => true],200);
     }
     public function update(Request $request, $id){
         $data = [
@@ -67,7 +67,7 @@ class TeamController extends Controller
         $user_role_member->team_id = $id;
         $user_role_member->save();
 
-        return response()->json(['update_team' => true],201);
+        return response()->json(['update_team' => true],200);
     }
     public function index($id){
         $team =  Team::where('id',$id)->get();

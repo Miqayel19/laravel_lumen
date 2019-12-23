@@ -7,7 +7,6 @@ use App\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\Console\Input\Input;
 
 class UserController extends Controller
 {
@@ -25,7 +24,7 @@ class UserController extends Controller
     public function show($id){
 
         $user = User::with('team')->where('id',$id)->get();
-        return response()->json(['showed user' => true],201);
+        return response()->json(['created' => true],200);
     }
 
     public function add(Request $request){
@@ -47,6 +46,6 @@ class UserController extends Controller
         $user['mail'] = $data['mail'];
 
         $user->save();
-        return response()->json(['created' => true],201);
+        return response()->json(['created' => true],200);
     }
 }

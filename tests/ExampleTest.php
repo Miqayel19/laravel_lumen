@@ -20,6 +20,7 @@ class ExampleTest extends TestCase
             'mail' => 'new@mail.ru'
         ]);
         $response->seeJson(['created' => true]);
+        $response->seeStatusCode(200);
     }
     public function testAddTeam(){
         $response = $this->json('POST', '/team', [
@@ -27,14 +28,17 @@ class ExampleTest extends TestCase
             'owner_id' => '1'
         ]);
         $response->seeJson(['created' => true]);
+        $response->seeStatusCode(200);
     }
     public function testGetUserWithTeam(){
-        $response = $this->json('GET', '/show/1');
-        $response->seeJson(['showed_user' => true]);
+        $response = $this->json('GET', '/user/1');
+        $response->seeStatusCode(200);
+        $response->seeJson(['created' => true]);
     }
     public function testGetTeam(){
         $response = $this->json('GET', '/team/1');
         $response->seeJson(['get_team' => true]);
+        $response->seeStatusCode(200);
     }
     public function testUpdateTeam(){
         $response = $this->json('PUT', '/team/1',[
@@ -42,6 +46,7 @@ class ExampleTest extends TestCase
             'member_id'=>'2'
         ]);
         $response->seeJson(['update_team' => true]);
+        $response->seeStatusCode(200);
     }
 
 
