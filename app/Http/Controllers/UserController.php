@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\User;
+use App\Token;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -24,6 +26,7 @@ class UserController extends Controller
     public function show($id){
 
         $user = User::with('team')->where('id',$id)->get();
+        dd($user);
         return response()->json(['created' => true],200);
     }
 
@@ -33,6 +36,7 @@ class UserController extends Controller
             'name' => $request['name'],
             'mail' => $request['mail'],
         ];
+
         $rules = [
             'name' =>'required',
             'mail' => 'required|email|unique:users'
@@ -41,11 +45,13 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
+        $token = Str::random(5);
+
         $user = new User();
         $user['name'] = $data['name'];
         $user['mail'] = $data['mail'];
-
-        $user->save();
-        return response()->json(['created' => true],200);
+        $user['token'] = $token;
+         $user->save();
+         return view('token')->with('token', $token);
     }
 }

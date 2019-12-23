@@ -20,7 +20,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public $timestamps = false;
 
     protected $fillable = [
-        'name', 'mail',
+        'name', 'mail','token'
     ];
 
     /**
