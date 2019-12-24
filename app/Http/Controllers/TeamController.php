@@ -68,7 +68,7 @@ class TeamController extends Controller
             $role_id_other_owner = Role::find(1); // Owner
             $role_id_member = Role::find(2); // Member
 
-            if (isset($user_create_team_id) && $user_create_team_id == $user_id) {
+//            if (isset($user_create_team_id) && $user_create_team_id == $user_id) {
 
                 Team::where('id', $id)->update($data);
 
@@ -104,7 +104,7 @@ class TeamController extends Controller
                 return response()->json(['update_team' => true], 200);
 
             }
-        }
+//        }
         return response()->json(['error' => false],404);
     }
     public function index($id){
