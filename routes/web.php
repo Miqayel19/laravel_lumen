@@ -17,11 +17,13 @@ $router->get('/', function () use ($router) {
 
 $router->post('user','UserController@add');
 $router->get('user/{id}','UserController@show');
+$router->delete('user/{id}','UserController@delete');
 
 $router->get('team/{id}','TeamController@index');
 $router->post('team','TeamController@add');
 $router->put('team/{id}','TeamController@update');
-$router->delete('team_delete/{id}','TeamController@deleteRoleinTeam');
+$router->delete('team/{id}','TeamController@delete');
+$router->delete('delete_role_team/{id}','TeamController@deleteRoleInTeam');
 
 
 

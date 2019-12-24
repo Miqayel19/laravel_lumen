@@ -117,8 +117,9 @@ class TeamController extends Controller
     }
     public function delete($id){
 
-        Team::where('id',$id)->delete();
+        Team::find($id)->delete();
         UserRoleTeam::where('team_id',$id)->delete();
+        return response()->json(['Team successfully deleted'=> true],200);
     }
     public function deleteRoleInTeam($id,$request){
         $token = $token = $request->headers->all()['token'][0];

@@ -55,6 +55,11 @@ class UserController extends Controller
          return view('token')->with('token', $token);
     }
     public function delete($id){
-        User::where('id',$id)->delete();
+        if(User::find($id)->delete()){
+            return response()->json(['User deleted successfully'=> true],200);
+        }
+        else{
+            return response()->json(['User not  deleted'=> false],200);
+        }
     }
 }
