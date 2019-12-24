@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
 use App\User;
-use App\Token;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,8 +24,7 @@ class UserController extends Controller
     public function show($id){
 
         $user = User::with('team')->where('id',$id)->get();
-        dd($user);
-        return response()->json(['created' => true],200);
+        return response()->json(['created' => true, 'user' =>$user],200);
     }
 
     public function add(Request $request){

@@ -61,12 +61,15 @@ class TeamController extends Controller
             return response()->json($validator->messages(), 200);
         }
         $token = $request->headers->all()['token'][0];
+
         if($token) {
 
             $user_create_team_id = User::where('token', $token)->first()['id'];
             $user_id = UserRoleTeam::where('team_id', $id)->first()['id'];
+
             $role_id_other_owner = Role::find(1); // Owner
             $role_id_member = Role::find(2); // Member
+
             if ($user_create_team_id && $user_create_team_id == $user_id) {
 
                 Team::where('id', $id)->update($data);
@@ -87,19 +90,20 @@ class TeamController extends Controller
                 $user_role_new_owner_info = UserRoleTeam::where([['user_id',$request->other_owner_id],['team_id',$id]])->first();
 
                 if(isset($user_role_new_owner_info)){
-                    if($user_role_new_owner_info['role_id']){
                         UserRoleTeam::where('user_id',$request->other_owner_id)->update(['role_id' => $role_id_other_owner->id]);
+
+                } elseif($request->other_owner_id == $user_id ){
+                        UserRoleTeam::where('user_id',$request->other_owner_id)->update(['role_id' => $role_id_other_owner->id]);
+
+                    } else{
+                        $user_role_other_owner = new UserRoleTeam();
+                        $user_role_other_owner->user_id = $request->other_owner_id;
+                        $user_role_other_owner->role_id = $role_id_other_owner->id;
+                        $user_role_other_owner->team_id = $id;
+                        $user_role_other_owner->save();
                     }
-                } else{
-                    $user_role_other_owner = new UserRoleTeam();
-//                    if($request->other_owner_id == $user_create_team_id ){
-//                        UserRoleTeam::where('user_id', $request->other_owner_id)->delete();
-//                    }
-                    $user_role_other_owner->user_id = $request->other_owner_id;
-                    $user_role_other_owner->role_id = $role_id_other_owner->id;
-                    $user_role_other_owner->team_id = $id;
-                    $user_role_other_owner->save();
-                }
+
+
 
                 return response()->json(['update_team' => true], 200);
 
