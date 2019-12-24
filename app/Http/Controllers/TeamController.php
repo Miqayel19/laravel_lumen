@@ -37,7 +37,9 @@ class TeamController extends Controller
             return response()->json($validator->messages(), 200);
         }
         $token = $request->headers->all()['token'][0];
-        $user_id = User::where('token',$token)->first()->value('id');
+        $user = User::where('token',$token)->first();
+        $user_id = $user['id'];
+//        dd($user_id['id']);
         $team = Team::create($data);
         $role_id_owner = Role::find(1); // Owner
         $user_role_owner = new  UserRoleTeam();
@@ -63,8 +65,7 @@ class TeamController extends Controller
         $token = $request->headers->all()['token'][0];
         if($token) {
             $user_create_team_id = User::where('token', $token)->first()->value('id');
-            $user_id = UserRoleTeam::where('team_id', $id)->first()->value('user_id');
-
+            $user_id = UserRoleTeam::where('team_id', $id)->first()['id'];
             $role_id_other_owner = Role::find(1); // Owner
             $role_id_member = Role::find(2); // Member
 
@@ -72,7 +73,7 @@ class TeamController extends Controller
 
                 Team::where('id', $id)->update($data);
 
-                $user_role_member_info = UserRoleTeam::where('user_id',$request->member_id)->first();
+                $user_role_member_info = UserRoleTeam::where([['user_id',$request->member_id],['team_id',$id]])->first();
                 if(isset($user_role_member_info)){
                     if($user_role_member_info['role_id']){
                         UserRoleTeam::where('user_id',$request->member_id)->update(['role_id' => $role_id_member->id]);
@@ -85,16 +86,17 @@ class TeamController extends Controller
                     $user_role_member->save();
                 }
 
-                $user_role_new_owner_info = UserRoleTeam::where('user_id',$request->other_owner_id)->first();
+                $user_role_new_owner_info = UserRoleTeam::where([['user_id',$request->other_owner_id],['team_id',$id]])->first();
+
                 if(isset($user_role_new_owner_info)){
                     if($user_role_new_owner_info['role_id']){
                         UserRoleTeam::where('user_id',$request->other_owner_id)->update(['role_id' => $role_id_other_owner->id]);
                     }
                 } else{
                     $user_role_other_owner = new UserRoleTeam();
-                    if($request->other_owner_id == $user_create_team_id ){
-                        UserRoleTeam::where('user_id', $request->other_owner_id)->delete();
-                    }
+//                    if($request->other_owner_id == $user_create_team_id ){
+//                        UserRoleTeam::where('user_id', $request->other_owner_id)->delete();
+//                    }
                     $user_role_other_owner->user_id = $request->other_owner_id;
                     $user_role_other_owner->role_id = $role_id_other_owner->id;
                     $user_role_other_owner->team_id = $id;
