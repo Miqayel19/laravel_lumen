@@ -37,9 +37,7 @@ class TeamController extends Controller
             return response()->json($validator->messages(), 200);
         }
         $token = $request->headers->all()['token'][0];
-        $user = User::where('token',$token)->first();
-        $user_id = $user['id'];
-//        dd($user_id['id']);
+        $user_id = User::where('token',$token)->first()['id'];
         $team = Team::create($data);
         $role_id_owner = Role::find(1); // Owner
         $user_role_owner = new  UserRoleTeam();
@@ -117,22 +115,32 @@ class TeamController extends Controller
     }
     public function delete($id){
 
-        Team::find($id)->delete();
-        UserRoleTeam::where('team_id',$id)->delete();
-        return response()->json(['Team successfully deleted'=> true],200);
+        if(Team::find($id)->delete()){
+            return response()->json(['Team successfully deleted'=> true],200);
+        }else{
+            return response()->json(['Team not deleted'=> true],200);
+
+        }
     }
-    public function deleteRoleInTeam($id,$request){
-        $token = $token = $request->headers->all()['token'][0];
+    public function deleteRole(Request $request, $id){
+        $token =  $request->headers->all()['token'][0];
         $user_id = User::where('token',$token)->first()['id'];
         $delete_owner_id = $request->owner_id;
         $delete_member_id = $request->member_id;
         if($delete_owner_id && $delete_owner_id !== $user_id){
             UserRoleTeam::where('user_id',$delete_owner_id)->delete();
+            return response()->json(['Team other owner deleted'=> true],200);
         }
+        elseif($delete_owner_id && $delete_owner_id == $user_id){
+            return response()->json(['Team  Owner  cant be deleted'=> true],200);
+        }
+
         if($delete_member_id){
             UserRoleTeam::where('user_id',$delete_member_id)->delete();
+            return response()->json(['Member deleted'=> true],200);
+        } else {
+            return response()->json(['Role not deleted' =>true],200);
         }
-        return response()->json(['deleted'=> true],200);
 
     }
 }

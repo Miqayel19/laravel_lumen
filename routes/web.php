@@ -23,7 +23,7 @@ $router->get('team/{id}','TeamController@index');
 $router->post('team','TeamController@add');
 $router->put('team/{id}','TeamController@update');
 $router->delete('team/{id}','TeamController@delete');
-$router->delete('delete_role_team/{id}','TeamController@deleteRoleInTeam');
+$router->delete('delete_role_team/{id}','TeamController@deleteRole');
 
 
 

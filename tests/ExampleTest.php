@@ -49,6 +49,17 @@ class ExampleTest extends TestCase
         $response->seeStatusCode(200);
     }
 
+    public function testDeleteTeam(){
+        $response = $this->json('DELETE', '/team/1');
+        $response->seeJson(['Team deleted successfully' => true]);
+        $response->seeStatusCode(200);
+    }
+    public function testDeleteUser(){
+        $response = $this->json('DELETE', '/user/1');
+        $response->seeJson(['User deleted successfully' => true]);
+        $response->seeStatusCode(200);
+    }
+
 
 
 }
