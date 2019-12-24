@@ -64,12 +64,12 @@ class TeamController extends Controller
         }
         $token = $request->headers->all()['token'][0];
         if($token) {
-            $user_create_team_id = User::where('token', $token)->first()->value('id');
+
+            $user_create_team_id = User::where('token', $token)->first()['id'];
             $user_id = UserRoleTeam::where('team_id', $id)->first()['id'];
             $role_id_other_owner = Role::find(1); // Owner
             $role_id_member = Role::find(2); // Member
-
-//            if (isset($user_create_team_id) && $user_create_team_id == $user_id) {
+            if ($user_create_team_id && $user_create_team_id == $user_id) {
 
                 Team::where('id', $id)->update($data);
 
@@ -106,11 +106,32 @@ class TeamController extends Controller
                 return response()->json(['update_team' => true], 200);
 
             }
-//        }
-        return response()->json(['error' => false],404);
+        } else {
+
+            return response()->json(['error' => 'Token not found'],404);
+        }
     }
     public function index($id){
         $team =  Team::where('id',$id)->get();
         return response()->json(['get_team'=>true]);
+    }
+    public function delete($id){
+
+        Team::where('id',$id)->delete();
+        UserRoleTeam::where('team_id',$id)->delete();
+    }
+    public function deleteRoleInTeam($id,$request){
+        $token = $token = $request->headers->all()['token'][0];
+        $user_id = User::where('token',$token)->first()['id'];
+        $delete_owner_id = $request->owner_id;
+        $delete_member_id = $request->member_id;
+        if($delete_owner_id && $delete_owner_id !== $user_id){
+            UserRoleTeam::where('user_id',$delete_owner_id)->delete();
+        }
+        if($delete_member_id){
+            UserRoleTeam::where('user_id',$delete_member_id)->delete();
+        }
+        return response()->json(['deleted'=> true],200);
+
     }
 }

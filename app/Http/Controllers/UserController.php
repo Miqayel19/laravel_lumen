@@ -54,4 +54,7 @@ class UserController extends Controller
          $user->save();
          return view('token')->with('token', $token);
     }
+    public function delete($id){
+        User::where('id',$id)->delete();
+    }
 }

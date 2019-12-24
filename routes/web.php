@@ -21,6 +21,7 @@ $router->get('user/{id}','UserController@show');
 $router->get('team/{id}','TeamController@index');
 $router->post('team','TeamController@add');
 $router->put('team/{id}','TeamController@update');
+$router->delete('team_delete/{id}','TeamController@deleteRoleinTeam');
 
 
 
