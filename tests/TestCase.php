@@ -1,7 +1,6 @@
 <?php
 
 
-use Illuminate\Support\Facades\Artisan;
 
 abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 {
