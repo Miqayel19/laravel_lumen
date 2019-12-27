@@ -47,9 +47,9 @@ return [
             'engine' => env('DB_ENGINE', null),
             'timezone' => env('DB_TIMEZONE', '+00:00'),
         ],
-        'sqlite_testing_db' => [
+        'sqlite' => [
             'driver' => 'sqlite',
-            'database' => base_path().'/database/testing_database.sqlite',
+            'database' => database_path().'/testing_database.sqlite',
             'prefix' => '',
         ],
 

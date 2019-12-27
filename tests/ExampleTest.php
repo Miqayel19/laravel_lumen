@@ -39,36 +39,36 @@ class ExampleTest extends TestCase
         $response->seeStatusCode(200);
     }
 
-    public function testGetUser()
-    {
-        $user = self::$created_user;
+//    public function testGetUser()
+//    {
+//        $user = self::$created_user;
+//
+//        $id = $user->id;
+//
+//        $response = $this->json('GET', '/user/'.$id);
+//        $response->seeJsonStructure([
+//            'status',
+//            'message',
+//            'user'
+//        ]);
+//        $response->seeStatusCode(200);
+//    }
 
-        $id = $user->id;
-
-        $response = $this->json('GET', '/user/'.$id);
-        $response->seeJsonStructure([
-            'status',
-            'message',
-            'user'
-        ]);
-        $response->seeStatusCode(200);
-    }
-
-    public function testUpdateUser()
-    {
-
-        $user = self::$created_user;
-        $id = $user->id;
-        $response = $this->json('PUT', '/user/'.$id , [
-            'name' => 'newc',
-            'mail' => 'newsdas@mail.ru'
-        ]);
-        $response->seeJsonStructure([
-            'status',
-            'message'
-        ]);
-        $response->seeStatusCode(200);
-    }
+//    public function testUpdateUser()
+//    {
+//
+//        $user = self::$created_user;
+//        $id = $user->id;
+//        $response = $this->json('PUT', '/user/'.$id , [
+//            'name' => 'newc',
+//            'mail' => 'newsdas@mail.ru'
+//        ]);
+//        $response->seeJsonStructure([
+//            'status',
+//            'message'
+//        ]);
+//        $response->seeStatusCode(200);
+//    }
 
 
 //    public function testAddOnlyTeam()
