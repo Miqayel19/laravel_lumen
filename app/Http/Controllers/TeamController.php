@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\Team;
-
 use App\User;
 use App\UserRoleTeam;
 use Illuminate\Http\Request;
@@ -23,127 +22,132 @@ class TeamController extends Controller
     }
 
 
-    public function add(Request $request){
+    public function add(Request $request)
+    {
 
         $data = [
             'title' => $request['title'],
         ];
 
         $rules = [
-            'title' =>'required|unique:teams',
-        ];
-        $validator = Validator::make($data,$rules);
-        if ($validator->fails()) {
-            return response()->json($validator->messages(), 200);
-        }
-        $token = $request->headers->all()['token'][0];
-        $user_id = User::where('token',$token)->first()['id'];
-        $team = Team::create($data);
-        $role_id_owner = Role::find(1); // Owner
-        $user_role_owner = new  UserRoleTeam();
-        $user_role_owner->user_id = $user_id;
-        $user_role_owner->role_id = $role_id_owner->id;
-        $user_role_owner->team_id = $team->id;
-
-        $user_role_owner->save();
-        return response()->json(['created' => true],200);
-    }
-    public function update(Request $request, $id){
-        $data = [
-            'title' => $request['title'],
-        ];
-
-        $rules = [
-            'title' => 'required|',
+            'title' => 'required|unique:teams',
         ];
         $validator = Validator::make($data, $rules);
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
+        $team = Team::create($data);
         $token = $request->headers->all()['token'][0];
+        $user_id = User::where('token', $token)->first()['id'];
+        $owner_role_id = Role::find(1); // Owner
 
-        if($token) {
+        $user_role_owner = new  UserRoleTeam();
+        $user_role_owner->user_id = $user_id;
+        $user_role_owner->role_id = $owner_role_id->id;
+        $user_role_owner->team_id = $team->id;
 
-            $user_create_team_id = User::where('token', $token)->first()['id'];
-            $user_id = UserRoleTeam::where('team_id', $id)->first()['id'];
+        $user_role_owner->save();
 
-            $role_id_other_owner = Role::find(1); // Owner
-            $role_id_member = Role::find(2); // Member
+        return response()->json(['status' => 'success', 'message' => 'Team created','team' => $team], 200);
+    }
 
-            if ($user_create_team_id && $user_create_team_id == $user_id) {
+    public function update(Request $request, $id)
+    {
+        $data = [
+            'title' => $request['title'],
+        ];
+        if ($data['title']) {
+            Team::where('id', $id)->update($data);
+            return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
+        } else {
 
-                Team::where('id', $id)->update($data);
+            return response()->json(['status' => 'failed', 'message' => 'Team does not updated'], 200);
+        }
+    }
 
-                $user_role_member_info = UserRoleTeam::where([['user_id',$request->member_id],['team_id',$id]])->first();
-                if(isset($user_role_member_info)){
-                    if($user_role_member_info['role_id']){
-                        UserRoleTeam::where('user_id',$request->member_id)->update(['role_id' => $role_id_member->id]);
-                    }
-                } else{
-                    $user_role_member = new  UserRoleTeam();
-                    $user_role_member->user_id = $request->member_id;
-                    $user_role_member->role_id = $role_id_member->id;
-                    $user_role_member->team_id = $id;
-                    $user_role_member->save();
-                }
+    public function show($id)
+    {
 
-                $user_role_new_owner_info = UserRoleTeam::where([['user_id',$request->other_owner_id],['team_id',$id]])->first();
+        $team = Team::with('users')->where('id', $id)->get();
+        if ($team) {
+            return response()->json(['status' => 'success', 'message' => 'Team found', 'team' => $team], 200);
+        } else {
+            return response()->json(['status' => 'failed', 'message' => 'Team not found'], 200);
+        }
+    }
 
-                if(isset($user_role_new_owner_info)){
-                        UserRoleTeam::where('user_id',$request->other_owner_id)->update(['role_id' => $role_id_other_owner->id]);
+    public function delete($id)
+    {
+        $team = Team::where('id', $id)->get();
+        if (!empty($team)){
+            Team::find($id)->delete();
+            return response()->json(['Team successfully deleted' => true], 200);
+        } else {
+            return response()->json(['Team not deleted' => true], 200);
+        }
+    }
 
-                } elseif($request->other_owner_id == $user_id ){
-                        UserRoleTeam::where('user_id',$request->other_owner_id)->update(['role_id' => $role_id_other_owner->id]);
+    public function addTeamMember(Request $request, $member_id, $team_id)
+    {
+        $member_role_id = Role::find(2); // Member
+        $team_member_info = UserRoleTeam::where([['user_id', $member_id], ['team_id', $team_id]])->first();
+        if (!empty($team_member_info)) {
+            UserRoleTeam::where('user_id', $member_id)->update(['role_id' => $member_role_id->id]);
+            return response()->json(['status' => 'success', 'message' => 'Team member  updated'], 200);
+        } else {
+            $team_member = new  UserRoleTeam();
+            $team_member->user_id = $member_id;
+            $team_member->role_id = $member_role_id->id;
+            $team_member->team_id = $team_id;
+            $team_member->save();
+            return response()->json(['status' => 'success', 'message' => 'Team member added'], 200);
+        }
+    }
 
-                    } else{
-                        $user_role_other_owner = new UserRoleTeam();
-                        $user_role_other_owner->user_id = $request->other_owner_id;
-                        $user_role_other_owner->role_id = $role_id_other_owner->id;
-                        $user_role_other_owner->team_id = $id;
-                        $user_role_other_owner->save();
-                    }
+    public function addTeamOwner(Request $request, $owner_id, $team_id)
+    {
+        $owner_role_id = Role::find(1); // Owner
+        $team_owner_info = UserRoleTeam::where([['user_id', $owner_id], ['team_id', $team_id]])->first();
+        if (!empty($team_owner_info)) {
+            UserRoleTeam::where('user_id', $owner_id)->update(['role_id' => $owner_role_id->id]);
+            return response()->json(['status' =>'success','message' =>'Team owner updated'], 200);
+        } else {
+            $team_owner = new  UserRoleTeam();
+            $team_owner->user_id = $owner_id;
+            $team_owner->role_id = $owner_role_id->id;
+            $team_owner->team_id = $team_id;
+            $team_owner->save();
+            return response()->json(['status' =>'success','message' =>'Team owner added'], 200);
+        }
+    }
 
+    public function deleteTeamMember($team_id, $member_id)
+    {
+        if ($team_id) {
+            if ($member_id) {
+                UserRoleTeam::where('user_id', $member_id)->delete();
+                return response()->json(['status' =>'success','message' =>'Member deleted'], 200);
+            } else {
 
-
-                return response()->json(['update_team' => true], 200);
-
+                return response()->json(['status' =>'success','message' =>'Member not found'], 200);
             }
         } else {
-
-            return response()->json(['error' => 'Token not found'],404);
+            return response()->json(['status' =>'success','message' =>'Team not found'], 200);
         }
+
     }
-    public function index($id){
-        $team =  Team::where('id',$id)->get();
-        return response()->json(['get_team'=>true]);
-    }
-    public function delete($id){
 
-        if(Team::find($id)->delete()){
-            return response()->json(['Team successfully deleted'=> true],200);
-        }else{
-            return response()->json(['Team not deleted'=> true],200);
-
-        }
-    }
-    public function deleteRole(Request $request, $id){
-        $token =  $request->headers->all()['token'][0];
-        $user_id = User::where('token',$token)->first()['id'];
-        $delete_owner_id = $request->owner_id;
-        $delete_member_id = $request->member_id;
-        if($delete_owner_id && $delete_owner_id !== $user_id){
-            UserRoleTeam::where('user_id',$delete_owner_id)->delete();
-            return response()->json(['Team other owner deleted'=> true],200);
-        }
-        elseif($delete_owner_id && $delete_owner_id == $user_id){
-            return response()->json(['Team  Owner  cant be deleted'=> true],200);
-        }
-
-        if($delete_member_id){
-            UserRoleTeam::where('user_id',$delete_member_id)->delete();
-            return response()->json(['Member deleted'=> true],200);
+    public function deleteTeamOwner($team_id, $owner_id)
+    {
+        if ($team_id) {
+            if ($owner_id) {
+                UserRoleTeam::where('user_id', $owner_id)->delete();
+                return response()->json(['status' =>'success','message' =>'Owner deleted'], 200);
+            } else {
+                return response()->json(['status' =>'success','message' =>'Owner not found'], 200);
+            }
         } else {
-            return response()->json(['Role not deleted' =>true],200);
+            return response()->json(['status' =>'success','message' =>'Team not found'], 200);
         }
 
     }

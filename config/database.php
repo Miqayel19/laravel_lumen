@@ -32,12 +32,6 @@ return [
     */
 
     'connections' => [
-
-        'sqlite_testing' => [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => env('DB_PREFIX', ''),
-        ],
         'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
@@ -53,6 +47,27 @@ return [
             'engine' => env('DB_ENGINE', null),
             'timezone' => env('DB_TIMEZONE', '+00:00'),
         ],
+        'sqlite_testing_db' => [
+            'driver' => 'sqlite',
+            'database' => base_path().'/database/testing_database.sqlite',
+            'prefix' => '',
+        ],
+
+//        'test_db' => [
+//            'driver' => 'mysql',
+//            'host' => env('TEST_DB_HOST', 'localhost'),
+//            'port' => env('TEST_DB_PORT', 3306),
+//            'database' => env('TEST_DB_DATABASE'),
+//            'username' => env('TEST_DB_USERNAME'),
+//            'password' => env('TEST_DB_PASSWORD'),
+//            'unix_socket' => env('DB_SOCKET', ''),
+//            'charset' => env('DB_CHARSET', 'utf8mb4'),
+//            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+//            'prefix' => env('DB_PREFIX', ''),
+//            'strict' => env('DB_STRICT_MODE', true),
+//            'engine' => env('DB_ENGINE', null),
+//            'timezone' => env('DB_TIMEZONE', '+00:00'),
+//        ],
 
 
 

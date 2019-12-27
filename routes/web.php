@@ -17,13 +17,21 @@ $router->get('/', function () use ($router) {
 
 $router->post('user','UserController@add');
 $router->get('user/{id}','UserController@show');
+$router->put('user/{id}','UserController@update');
 $router->delete('user/{id}','UserController@delete');
 
-$router->get('team/{id}','TeamController@index');
 $router->post('team','TeamController@add');
+$router->get('team/{id}','TeamController@show');
 $router->put('team/{id}','TeamController@update');
 $router->delete('team/{id}','TeamController@delete');
-$router->delete('delete_role_team/{id}','TeamController@deleteRole');
+
+
+$router->post('add_team_member/user/{member_id}/team/{team_id}','TeamController@addTeamMember');
+$router->post('add_team_owner/user/{owner_id}/team/{team_id}','TeamController@addTeamOwner');
+
+
+$router->delete('delete_team_member/user/{member_id}/team/{team_id}','TeamController@deleteTeamMember');
+$router->delete('delete_team_owner/user/{owner_id}/team/{team_id}','TeamController@deleteTeamOwner');
 
 
 
