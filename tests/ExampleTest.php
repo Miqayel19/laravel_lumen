@@ -1,11 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
-use Laravel\Lumen\Testing\DatabaseTransactions;
-
-use App\User;
-use App\UserRoleTeam;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class ExampleTest extends TestCase
 {
@@ -15,21 +10,16 @@ class ExampleTest extends TestCase
      * @return void
      */
 
-//    use DatabaseTransactions;
-//    use DatabaseMigrations;
-    public function setUp():void
-    {
-        parent::setUp();
-        $this->artisan('db:seed');
-    }
 
     public static $created_user;
     public static $created_team;
-    public static $second_user;
+    public  $owner;
+    public  $member;
+
+
 
     public function testAddUser()
     {
-
         $response = $this->json('POST', '/user', [
             'name' => 'new',
             'mail' => 'new@mail.ru'
@@ -49,9 +39,7 @@ class ExampleTest extends TestCase
     public function testGetUser()
     {
         $user = self::$created_user;
-
         $id = $user->id;
-
         $response = $this->json('GET', '/user/'.$id);
         $response->seeJsonStructure([
             'status',
@@ -86,12 +74,10 @@ class ExampleTest extends TestCase
         $token = $user->token;
         $response = $this->json('POST', '/team', [
             'title' => 'Test_team',
-            'user_id' =>$user->id
         ],['token' =>  $token]);
         $result = $response->seeJsonStructure(['team'])->response->getContent();
         $json = json_decode($result);
         self::$created_team = $json->team;
-
         $response->seeJsonStructure([
             'status',
             'message',
@@ -125,60 +111,107 @@ class ExampleTest extends TestCase
         ]);
         $response->seeStatusCode(200);
     }
-//
+
+    public function testAddUsersToTeam($membership = null){
+        $date = date_create();
+        $response = $this->json('POST', '/user', [
+            'name' => 'new'.date_timestamp_get($date),
+            'mail' => date_timestamp_get($date).'@mail.ru'
+        ]);
+        $result=$response->response->getContent();
+        $json = json_decode($result);
+        if($membership == 'owner'){
+             $json->user = $this->owner ;
+        }elseif($membership == 'member'){
+            $json->user = $this->member ;
+        }
+
+        $response->seeStatusCode(200);
+
+    }
     public function testAddTeamMember()
     {
-        $result = $this->json('POST', '/user', [
-            'name' => 'new1',
-            'mail' => 'new1@mail.ru'
-        ]);
-        $result = $result->seeJsonStructure(['user'])->response->getContent();
-        $json_user = json_decode($result);
-        $json_user->user= self::$second_user;
-        $token = $json_user->user->token;
+
+        $user = self::$created_user;
+        $token = $user->token;
         $team = self::$created_team;
         $team_id = $team->id;
-        $user_id = $json_user->user->id;
-        $response = $this->json('POST', '/add_team_member/user/'.$user_id.'/team/'.$team_id,['token' => $token]);
-        $response->seeStatusCode(200);
+        $this->testAddUsersToTeam('member');
+        $member = $this->member;
+        $member_id = $member['id'];
+        $response = $this->json('POST', '/add_team_member/user/'.$member_id.'/team/'.$team_id,[],['token' => $token]);
+        $response->seeJsonStructure([
+            'message'
+        ]);
     }
 
     public function testAddTeamOwner()
     {
-        $token = self::$second_user->token;
-        $user_id = self::$second_user->id;
+        $user= self::$created_user;
+        $token = $user->token;
+        $this->testAddUsersToTeam('owner');
+        $owner =  $this->owner;
+        $owner_id = $owner['id'];
         $team = self::$created_team;
         $team_id = $team->id;
-        $response = $this->json('POST', '/add_team_owner/user/'.$user_id.'/team/'.$team_id,['token'=>$token]);
-        $response->seeStatusCode(200);
+        $response = $this->json('POST', '/add_team_owner/user/'.$owner_id.'/team/'.$team_id,[],['token'=>$token]);
+        $response->seeJsonStructure([
+            'message'
+        ]);
     }
 
     public function testDeleteTeamMember()
     {
-        $response = $this->json('DELETE', '/delete_team_member/user/4/team/1');
-        $response->seeStatusCode(200);
+        $user= self::$created_user;
+        $token = $user->token;
+        $member = $this->member;
+        $member_id = $member['id'];
+        $team = self::$created_team;
+        $team_id = $team->id;
+        $response = $this->json('DELETE', '/delete_team_member/user/'.$member_id.'/team/'.$team_id,['token' =>$token]);
+        $response->seeJsonStructure([
+            'message',
+        ]);
+
     }
 
     public function testDeleteTeamOwner()
     {
-        $response = $this->json('DELETE', '/delete_team_owner/user/3/team/1');
-        $response->seeStatusCode(200);
-    }
-
-    public function testDeleteUser()
-    {
-        $response = $this->json('DELETE', '/user/1');
+        $user= self::$created_user;
+        $token = $user->token;
+        $owner =  $this->owner;
+        $owner_id = $owner['id'];
+        $team = self::$created_team;
+        $team_id = $team->id;
+        $response = $this->json('DELETE', '/delete_team_owner/user/'.$owner_id.'/team/'.$team_id,['token' => $token]);
         $response->seeJsonStructure([
-            'status',
             'message'
         ]);
-        $response->seeStatusCode(200);
     }
 
     public function testDeleteTeam()
     {
-        $response = $this->json('DELETE', '/team/3');
-        $response->seeStatusCode(200);
+        $team = self::$created_team;
+        $team_id = $team->id;
+        $response = $this->json('DELETE', '/team/'.$team_id);
+        $response->seeJsonStructure([
+            'status',
+            'message'
+        ]);
+    }
+    public function testDeleteUser()
+    {
+        $user = self::$created_user;
+        $user_id = $user->id;
+        $response = $this->json('DELETE', '/user/'.$user_id);
+        $response->seeJsonStructure([
+            'status',
+            'message'
+        ]);
     }
 
+        public function testResetDb(){
+            Artisan::call('migrate:reset');
+            $this->assertTrue(true);
+        }
 }

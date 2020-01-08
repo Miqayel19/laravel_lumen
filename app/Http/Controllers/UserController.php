@@ -32,7 +32,6 @@ class UserController extends Controller
 
     }
 
-
     public function add(Request $request)
     {
 
@@ -76,9 +75,11 @@ class UserController extends Controller
             'name' => $request['name'],
             'mail' => $request['mail'],
         ];
-        if ($data['name'] && $data['mail']) {
+        if(!empty($data['name'] && $data['mail'])) {
             User::where('id', $id)->update($data);
             return response()->json(['status' => 'success', 'message' => 'User updated'], 200);
+        } else{
+            return response()->json(['status' => 'success', 'message' => 'Provide valid name and username'], 200);
         }
 
     }

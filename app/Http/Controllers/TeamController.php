@@ -38,6 +38,7 @@ class TeamController extends Controller
         }
         $team = Team::create($data);
         $token = $request->headers->all()['token'][0];
+
         $user_id = User::where('token', $token)->first()['id'];
 
         $owner_role_id = Role::find(1); // Owner
@@ -56,18 +57,16 @@ class TeamController extends Controller
         $data = [
             'title' => $request['title'],
         ];
-        if ($data['title']) {
+        if (!empty($data['title'])) {
             Team::where('id', $id)->update($data);
             return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
         } else {
-
             return response()->json(['status' => 'failed', 'message' => 'Team does not updated'], 200);
         }
     }
 
     public function show($id)
     {
-
         $team = Team::with('users')->where('id', $id)->get();
         if ($team) {
             return response()->json(['status' => 'success', 'message' => 'Team found', 'team' => $team], 200);
@@ -93,25 +92,22 @@ class TeamController extends Controller
         $token = $request->headers->all()['token'][0];
         $user_id = User::where('token', $token)->first()['id'];
         if($user_id){
-
             $team_member_info = UserRoleTeam::where([['user_id', $member_id], ['team_id', $team_id]])->first();
             if (!empty($team_member_info)) {
                 UserRoleTeam::where('user_id', $member_id)->update(['role_id' => $member_role_id->id]);
-                return response()->json(['status' => 'success', 'message' => 'Team member  updated'], 200);
+                return response()->json(['status' =>'success','message' => 'Team member  updated'], 200);
             } else {
                 $team_member = new  UserRoleTeam();
                 $team_member->user_id = $member_id;
                 $team_member->role_id = $member_role_id->id;
                 $team_member->team_id = $team_id;
                 $team_member->save();
-                return response()->json(['status' => 'success', 'message' => 'Team member added'], 200);
             }
-
+            return response()->json(['status' =>'success','message' => 'Team member added'], 200);
         }
         else{
-            return response()->json(['status' => 'failed', 'message' => 'You are not the creator of this team'], 200);
+            return response()->json(['status' =>'success','message' => 'You are not the creator of this team'], 200);
         }
-
     }
 
     public function addTeamOwner(Request $request, $owner_id, $team_id)
@@ -146,11 +142,14 @@ class TeamController extends Controller
         if($user_id){
             if ($team_id) {
                 if ($member_id) {
-                    UserRoleTeam::where('user_id', $member_id)->delete();
-                    return response()->json(['status' =>'success','message' =>'Member deleted'], 200);
-                } else {
-
-                    return response()->json(['status' =>'success','message' =>'Member not found'], 200);
+                    $member = UserRoleTeam::where('user_id',$member_id)->first();
+                    if(!empty($member)){
+                        UserRoleTeam::where('user_id', $member_id)->delete();
+                        return response()->json(['status' =>'success','message' =>'Member deleted'], 200);
+                    }
+                    else {
+                        return response()->json(['status' =>'success','message' =>'Member not found'], 200);
+                    }
                 }
             } else {
                 return response()->json(['status' =>'success','message' =>'Team not found'], 200);
@@ -165,25 +164,26 @@ class TeamController extends Controller
 
     public function deleteTeamOwner(Request $request,$team_id, $owner_id)
     {
-
         $token = $request->headers->all()['token'][0];
         $user_id = User::where('token', $token)->first()['id'];
         if($user_id) {
             if ($team_id) {
                 if ($owner_id) {
-                    UserRoleTeam::where('user_id', $owner_id)->delete();
-                    return response()->json(['status' => 'success', 'message' => 'Owner deleted'], 200);
-                } else {
-                    return response()->json(['status' => 'success', 'message' => 'Owner not found'], 200);
-                }
+                    $owner = UserRoleTeam::where('user_id', $owner_id)->first();
+                    if(!empty($owner)){
+                        UserRoleTeam::where('user_id', $owner_id)->delete();
+                        return response()->json(['status' => 'success', 'message' => 'Owner deleted'], 200);
+                    } else {
+                        return response()->json(['status' => 'success', 'message' => 'Owner not found'], 200);
+                    }
             } else {
                 return response()->json(['status' => 'success', 'message' => 'Team not found'], 200);
             }
         }
-        else{
-            return response()->json(['status' =>'failed','message' =>'You are not the creator of this team'], 200);
+            else{
+                return response()->json(['status' =>'failed','message' =>'You are not the creator of this team'], 200);
+            }
         }
-
 
     }
 }
