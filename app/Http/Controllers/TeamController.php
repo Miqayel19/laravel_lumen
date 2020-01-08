@@ -106,7 +106,7 @@ class TeamController extends Controller
             return response()->json(['status' =>'success','message' => 'Team member added'], 200);
         }
         else{
-            return response()->json(['status' =>'success','message' => 'You are not the creator of this team'], 200);
+            return response()->json(['status' =>'failed','message' => 'You are not the creator of this team'], 200);
         }
     }
 
@@ -148,11 +148,11 @@ class TeamController extends Controller
                         return response()->json(['status' =>'success','message' =>'Member deleted'], 200);
                     }
                     else {
-                        return response()->json(['status' =>'success','message' =>'Member not found'], 200);
+                        return response()->json(['status' =>'failed','message' =>'Member not found'], 200);
                     }
                 }
             } else {
-                return response()->json(['status' =>'success','message' =>'Team not found'], 200);
+                return response()->json(['status' =>'failed','message' =>'Team not found'], 200);
             }
         }
         else{
@@ -174,10 +174,10 @@ class TeamController extends Controller
                         UserRoleTeam::where('user_id', $owner_id)->delete();
                         return response()->json(['status' => 'success', 'message' => 'Owner deleted'], 200);
                     } else {
-                        return response()->json(['status' => 'success', 'message' => 'Owner not found'], 200);
+                        return response()->json(['status' => 'failed', 'message' => 'Owner not found'], 200);
                     }
             } else {
-                return response()->json(['status' => 'success', 'message' => 'Team not found'], 200);
+                return response()->json(['status' => 'failed', 'message' => 'Team not found'], 200);
             }
         }
             else{

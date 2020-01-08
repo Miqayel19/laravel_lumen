@@ -34,7 +34,6 @@ class UserController extends Controller
 
     public function add(Request $request)
     {
-
         $data = [
             'name' => $request['name'],
             'mail' => $request['mail'],
@@ -75,12 +74,18 @@ class UserController extends Controller
             'name' => $request['name'],
             'mail' => $request['mail'],
         ];
-        if(!empty($data['name'] && $data['mail'])) {
+        $rules = [
+            'name' => 'required',
+            'mail' => 'required|email|unique:users,mail,' . $id . ',id',
+        ];
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        } else {
             User::where('id', $id)->update($data);
             return response()->json(['status' => 'success', 'message' => 'User updated'], 200);
-        } else{
-            return response()->json(['status' => 'success', 'message' => 'Provide valid name and username'], 200);
         }
+
 
     }
 
