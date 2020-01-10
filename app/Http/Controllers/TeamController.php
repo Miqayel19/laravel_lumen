@@ -80,135 +80,111 @@ class TeamController extends Controller
 
     public function update(Request $request, $id)
     {
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $id]])->first();
-        if ($token && $user) {
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        dd($team_owner);
 
-            $data = [
-                'title' => $request['title'],
-            ];
-            $rules = [
-                'title' => 'required|unique:teams',
-            ];
-            $validator = Validator::make($data, $rules);
-            if ($validator->fails()) {
-                return response()->json($validator->messages(), 200);
-            } else {
-                $team = Team::where('id', $id)->first();
-                if(!empty($team)){
-                    if ($team_owner) {
-                        Team::where('id', $id)->update($data);
-                        return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
-                    } else {
-                        return response()->json(['status' => 'failed', 'message' => 'You dont have an access to update the team'], 200);
-                    }
-                }
-                else {
-                    return response()->json(['status' => 'failed', 'message' => 'Team not updated'], 200);
-                }
-            }
+        $data = [
+            'title' => $request['title'],
+        ];
+        $rules = [
+            'title' => 'required|unique:teams',
+        ];
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 200);
         } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user']);
+            $team = Team::where('id', $id)->first();
+            if (!empty($team)) {
+                Team::where('id', $id)->update($data);
+                return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
+            } else {
+                return response()->json(['status' => 'failed', 'message' => 'Team not updated'], 200);
+            }
         }
+
 
     }
 
 
     public function delete(Request $request, $id)
     {
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $id]])->first();
-        if ($token && $user) {
-            $team = Team::where('id', $id)->first();
-            if (!empty($team)) {
-                if ($team_owner) {
-                    $team->delete();
-                    return response()->json(['status' => 'success', 'message' => 'Team successfully deleted'], 200);
-                } else {
-                    return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
-                }
-            } else {
-                return response()->json(['status' => 'failed', 'message' => 'Team not deleted'], 200);
-            }
-        } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user']);
-        }
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $id]])->first();
 
+        $team = Team::where('id', $id)->first();
+        if (!empty($team)) {
+
+            $team->delete();
+            return response()->json(['status' => 'success', 'message' => 'Team successfully deleted'], 200);
+
+        } else {
+            return response()->json(['status' => 'failed', 'message' => 'Team not deleted'], 200);
+        }
     }
+
 
     public function addTeamMember(Request $request, $member_id, $team_id)
     {
         self::$member_role_id = Role::where('status', 'Member')->first()->id;
         $member_role_id = self::$member_role_id;
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
-        if ($token && $user) {
-            if ($team_owner) {
-                $team_member_info = UserRoleTeam::where([['user_id', $member_id], ['team_id', $team_id]])->first();
-                if (!empty($team_member_info)) {
-                    UserRoleTeam::where('user_id', $member_id)->update(['role_id' => $member_role_id]);
-                    return response()->json(['status' => 'success', 'message' => 'Team member  updated'], 200);
-                } else {
-                    UserRoleTeam::create([
-                        'user_id' => $member_id,
-                        'team_id' => $team_id,
-                        'role_id' => $member_role_id,
-                    ]);
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
 
-                }
-                return response()->json(['status' => 'success', 'message' => 'Team member added'], 200);
-            } else {
-                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
-            }
+
+        $team_member_info = UserRoleTeam::where([['user_id', $member_id], ['team_id', $team_id]])->first();
+        if (!empty($team_member_info)) {
+            UserRoleTeam::where('user_id', $member_id)->update(['role_id' => $member_role_id]);
+            return response()->json(['status' => 'success', 'message' => 'Team member  updated'], 200);
         } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user'], 200);
-        }
+            UserRoleTeam::create([
+                'user_id' => $member_id,
+                'team_id' => $team_id,
+                'role_id' => $member_role_id,
+            ]);
 
+        }
+        return response()->json(['status' => 'success', 'message' => 'Team member added'], 200);
     }
 
 
     public function addTeamOwner(Request $request, $owner_id, $team_id)
     {
         $owner_role_id = self::$owner_role_id;
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
-        if ($token && $user) {
-            if ($team_owner) {
-                $team_owner_info = UserRoleTeam::where([['user_id', $owner_id], ['team_id', $team_id]])->first();
-                if (!empty($team_owner_info)) {
-                    UserRoleTeam::where('user_id', $owner_id)->update(['role_id' => $owner_role_id]);
-                    return response()->json(['status' => 'success', 'message' => 'Team owner updated'], 200);
-                } else {
-                    UserRoleTeam::create([
-                        'user_id' => $owner_id,
-                        'team_id' => $team_id,
-                        'role_id' => $owner_role_id,
-                    ]);
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
+//        if ($token && $user) {
 
-                    return response()->json(['status' => 'success', 'message' => 'Team owner added'], 200);
-                }
-
-            } else {
-                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
-            }
-
+        $team_owner_info = UserRoleTeam::where([['user_id', $owner_id], ['team_id', $team_id]])->first();
+        if (!empty($team_owner_info)) {
+            UserRoleTeam::where('user_id', $owner_id)->update(['role_id' => $owner_role_id]);
+            return response()->json(['status' => 'success', 'message' => 'Team owner updated'], 200);
         } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user'], 200);
+            UserRoleTeam::create([
+                'user_id' => $owner_id,
+                'team_id' => $team_id,
+                'role_id' => $owner_role_id,
+            ]);
+
+            return response()->json(['status' => 'success', 'message' => 'Team owner added'], 200);
         }
+
+
+
+
 
     }
 
     public function deleteTeamMember(Request $request, $team_id, $member_id)
     {
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
-        if ($token && $user) {
-            if ($team_owner) {
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
+//        if ($token && $user) {
+//            if ($team_owner) {
                 if ($team_id) {
                     if ($member_id) {
                         $member = UserRoleTeam::where('user_id', $member_id)->first();
@@ -222,24 +198,24 @@ class TeamController extends Controller
                 } else {
                     return response()->json(['status' => 'failed', 'message' => 'Team not found'], 200);
                 }
-            } else {
-                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
-            }
+//            } else {
+//                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
+//            }
 
-        } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user'], 200);
-        }
+//        } else {
+//            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user'], 200);
+//        }
 
 
     }
 
     public function deleteTeamOwner(Request $request, $team_id, $owner_id)
     {
-        $token = $request->headers->all()['token'][0];
-        $user = User::where('token', $token)->first();
-        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
-        if ($token && $user) {
-            if ($team_owner) {
+//        $token = $request->headers->all()['token'][0];
+//        $user = User::where('token', $token)->first();
+//        $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
+//        if ($token && $user) {
+//            if ($team_owner) {
                 if ($team_id) {
                     if ($owner_id) {
                         $owner = UserRoleTeam::where('user_id', $owner_id)->first();
@@ -254,13 +230,13 @@ class TeamController extends Controller
                     }
                 }
 
-            } else {
-                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
-
-            }
-        } else {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user']);
-        }
+//            } else {
+//                return response()->json(['status' => 'success', 'message' => 'You dont have an access to delete the team'], 200);
+//
+//            }
+//        } else {
+//            return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user']);
+//        }
 
     }
 }

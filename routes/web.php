@@ -11,9 +11,9 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+//$router->get('/', function () use ($router) {
+//    return $router->app->version();
+//});
 
 $router->post('users','UserController@add');
 $router->get('users/{id}','UserController@index');
@@ -21,19 +21,34 @@ $router->get('users','UserController@show');
 $router->put('users/{id}','UserController@update');
 $router->delete('users/{id}','UserController@delete');
 
-$router->post('teams','TeamController@add');
-$router->get('teams/{id}','TeamController@index');
-$router->get('teams','TeamController@show');
-$router->put('teams/{id}','TeamController@update');
-$router->delete('teams/{id}','TeamController@delete');
+//$router->post('teams','TeamController@add');
+//$router->get('teams/{id}','TeamController@index');
+//$router->get('teams','TeamController@show');
+//$router->put('teams/{id}','TeamController@update');
+//$router->delete('teams/{id}','TeamController@delete');
 
 
-$router->post('add_team_member/users/{member_id}/teams/{team_id}','TeamController@addTeamMember');
-$router->post('add_team_owner/users/{owner_id}/teams/{team_id}','TeamController@addTeamOwner');
+
+$router->group(['middleware' => 'role'], function () use ($router) {
+    $router->put('teams/{id}','TeamController@update');
+    $router->delete('teams/{id}','TeamController@delete');
+    $router->post('add_team_member/users/{member_id}/teams/{team_id}','TeamController@addTeamMember');
+    $router->post('add_team_owner/users/{owner_id}/teams/{team_id}','TeamController@addTeamOwner');
+    $router->delete('delete_team_member/users/{member_id}/teams/{team_id}','TeamController@deleteTeamMember');
+    $router->delete('delete_team_owner/users/{owner_id}/teams/{team_id}','TeamController@deleteTeamOwner');
+    $router->post('teams','TeamController@add');
+    $router->get('teams/{id}','TeamController@index');
+    $router->get('teams','TeamController@show');
+
+});
 
 
-$router->delete('delete_team_member/users/{member_id}/teams/{team_id}','TeamController@deleteTeamMember');
-$router->delete('delete_team_owner/users/{owner_id}/teams/{team_id}','TeamController@deleteTeamOwner');
+//$router->post('add_team_member/users/{member_id}/teams/{team_id}','TeamController@addTeamMember');
+//$router->post('add_team_owner/users/{owner_id}/teams/{team_id}','TeamController@addTeamOwner');
+//
+//
+//$router->delete('delete_team_member/users/{member_id}/teams/{team_id}','TeamController@deleteTeamMember');
+//$router->delete('delete_team_owner/users/{owner_id}/teams/{team_id}','TeamController@deleteTeamOwner');
 
 
 
