@@ -156,7 +156,7 @@ class ExampleTest extends TestCase
         $this->testAddUsersToTeam('member');
         $member = $this->member;
         $member_id = $member['id'];
-        $response = $this->json('POST', '/add_team_member/user/'.$member_id.'/team/'.$team_id,[],['token' => $token]);
+        $response = $this->json('POST', '/add_team_member/users/'.$member_id.'/teams/'.$team_id,[],['token' => $token]);
         $response->seeJsonStructure([
             'message',
         ]);
@@ -171,7 +171,7 @@ class ExampleTest extends TestCase
         $owner_id = $owner['id'];
         $team = self::$created_team;
         $team_id = $team->id;
-        $response = $this->json('POST', '/add_team_owner/user/'.$owner_id.'/team/'.$team_id,[],['token'=>$token]);
+        $response = $this->json('POST', '/add_team_owner/users/'.$owner_id.'/teams/'.$team_id,[],['token'=>$token]);
         $response->seeJsonStructure([
             'message'
         ]);
@@ -185,7 +185,7 @@ class ExampleTest extends TestCase
         $member_id = $member['id'];
         $team = self::$created_team;
         $team_id = $team->id;
-        $response = $this->json('DELETE', '/delete_team_member/user/'.$member_id.'/team/'.$team_id,['token' =>$token]);
+        $response = $this->json('DELETE', '/delete_team_member/users/'.$member_id.'/teams/'.$team_id,['token' =>$token]);
         $response->seeJsonStructure([
             'message',
         ]);
@@ -200,7 +200,7 @@ class ExampleTest extends TestCase
         $owner_id = $owner['id'];
         $team = self::$created_team;
         $team_id = $team->id;
-        $response = $this->json('DELETE', '/delete_team_owner/user/'.$owner_id.'/team/'.$team_id,['token' => $token]);
+        $response = $this->json('DELETE', '/delete_team_owner/users/'.$owner_id.'/teams/'.$team_id,['token' => $token]);
         $response->seeJsonStructure([
             'message'
         ]);

@@ -28,12 +28,12 @@ $router->put('teams/{id}','TeamController@update');
 $router->delete('teams/{id}','TeamController@delete');
 
 
-$router->post('add_team_member/user/{member_id}/team/{team_id}','TeamController@addTeamMember');
-$router->post('add_team_owner/user/{owner_id}/team/{team_id}','TeamController@addTeamOwner');
+$router->post('add_team_member/users/{member_id}/teams/{team_id}','TeamController@addTeamMember');
+$router->post('add_team_owner/users/{owner_id}/teams/{team_id}','TeamController@addTeamOwner');
 
 
-$router->delete('delete_team_member/user/{member_id}/team/{team_id}','TeamController@deleteTeamMember');
-$router->delete('delete_team_owner/user/{owner_id}/team/{team_id}','TeamController@deleteTeamOwner');
+$router->delete('delete_team_member/users/{member_id}/teams/{team_id}','TeamController@deleteTeamMember');
+$router->delete('delete_team_owner/users/{owner_id}/teams/{team_id}','TeamController@deleteTeamOwner');
 
 
 

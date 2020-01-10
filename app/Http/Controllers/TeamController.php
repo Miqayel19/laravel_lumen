@@ -236,7 +236,6 @@ class TeamController extends Controller
         $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $team_id]])->first();
         if ($token && $user) {
             if ($team_owner) {
-
                 if ($team_id) {
                     if ($owner_id) {
                         $owner = UserRoleTeam::where('user_id', $owner_id)->first();
