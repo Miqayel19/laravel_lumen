@@ -40,7 +40,7 @@ class UserController extends Controller
         if (!empty($users)) {
             return response()->json(['status' => 'success', 'message' => 'All users', 'users' => $users], 200);
         } else {
-            return response()->json(['status' => 'failed', 'message' => 'Users not found'], 200);
+            return response()->json(['status' => 'success', 'message' => 'Users not found','users' => $users], 200);
         }
     }
 

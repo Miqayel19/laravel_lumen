@@ -95,13 +95,18 @@ class TeamController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->messages(), 200);
             } else {
-                if ($team_owner) {
-                    Team::where('id', $id)->update($data);
-                    return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
-                } else {
-                    return response()->json(['status' => 'failed', 'message' => 'You dont have an access to update the team'], 200);
+                $team = Team::where('id', $id)->first();
+                if(!empty($team)){
+                    if ($team_owner) {
+                        Team::where('id', $id)->update($data);
+                        return response()->json(['status' => 'success', 'message' => 'Team updated'], 200);
+                    } else {
+                        return response()->json(['status' => 'failed', 'message' => 'You dont have an access to update the team'], 200);
+                    }
                 }
-
+                else {
+                    return response()->json(['status' => 'failed', 'message' => 'Team not updated'], 200);
+                }
             }
         } else {
             return response()->json(['status' => 'failed', 'message' => 'Invalid token or Invalid user']);
@@ -116,7 +121,6 @@ class TeamController extends Controller
         $user = User::where('token', $token)->first();
         $team_owner = UserRoleTeam::where([['user_id', $user->id], ['team_id', $id]])->first();
         if ($token && $user) {
-
             $team = Team::where('id', $id)->first();
             if (!empty($team)) {
                 if ($team_owner) {
