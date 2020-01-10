@@ -25,10 +25,11 @@ class UserController extends Controller
     public function index($id)
     {
         $user = User::with('team')->where('id', $id)->first();
-        if (empty($user)) {
-            return response()->json(['status' => 'failed', 'message' => 'User not found'], 200);
-        } else {
+        if (!empty($user)) {
             return response()->json(['status' => 'success', 'message' => 'User', 'user' => $user], 200);
+
+        } else {
+            return response()->json(['status' => 'failed', 'message' => 'User not found'], 200);
         }
 
     }
@@ -83,7 +84,7 @@ class UserController extends Controller
         ];
         $rules = [
             'name' => 'required',
-            'mail' => 'required|email|unique:users,mail,' . $id . ',id',
+            'mail' => 'required|email|unique:users',
         ];
         $validator = Validator::make($data, $rules);
         if ($validator->fails()) {

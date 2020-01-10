@@ -11,20 +11,18 @@ class ExampleTest extends TestCase
      */
 
 
-    public static $created_user;
-    public static $created_team;
-    public  $owner;
-    public  $member;
+    public static  $created_user,$created_team;
+    public  $owner,$member;
 
 
 
     public function testAddUser()
     {
-        $response = $this->json('POST', '/user', [
+        $response = $this->json('POST', '/users', [
             'name' => 'new',
-            'mail' => 'new@mail.ru'
+            'mail' => 'fzc@mail.ru'
         ]);
-        $result = $response->seeJsonStructure(['user'])->response->getContent();
+        $result = $response->response->getContent();
         $json = json_decode($result);
         self::$created_user = $json->user;
 
@@ -40,7 +38,7 @@ class ExampleTest extends TestCase
     {
         $user = self::$created_user;
         $id = $user->id;
-        $response = $this->json('GET', '/user/'.$id);
+        $response = $this->json('GET', '/users/'.$id);
         $response->seeJsonStructure([
             'status',
             'message',
@@ -48,15 +46,26 @@ class ExampleTest extends TestCase
         ]);
         $response->seeStatusCode(200);
     }
+    public function testGetUsers()
+    {
+        $response = $this->json('GET', '/users/');
+        $response->seeJsonStructure([
+            'status',
+            'message',
+            'users'
+        ]);
+        $response->seeStatusCode(200);
+    }
+
 
     public function testUpdateUser()
     {
 
         $user = self::$created_user;
         $id = $user->id;
-        $response = $this->json('PUT', '/user/'.$id , [
+        $response = $this->json('PUT', '/users/'.$id , [
             'name' => 'newc',
-            'mail' => 'newsdas@mail.ru'
+            'mail' => 'nesdsaaaaaaaadszxwsdas@mail.ru'
         ]);
         $response->seeJsonStructure([
             'status',
@@ -68,14 +77,12 @@ class ExampleTest extends TestCase
 
     public function testAddOnlyTeam()
     {
-
         $user = self::$created_user;
-
         $token = $user->token;
-        $response = $this->json('POST', '/team', [
-            'title' => 'Test_team',
+        $response = $this->json('POST', '/teams', [
+            'title' => 'Tesdsssdsddteam',
         ],['token' =>  $token]);
-        $result = $response->seeJsonStructure(['team'])->response->getContent();
+        $result = $response->response->getContent();
         $json = json_decode($result);
         self::$created_team = $json->team;
         $response->seeJsonStructure([
@@ -89,36 +96,46 @@ class ExampleTest extends TestCase
     {
         $team = self::$created_team;
         $id = $team->id;
-        $response = $this->json('GET', '/team/'.$id);
+        $response = $this->json('GET', '/teams/'.$id);
         $response->seeJsonStructure([
             'status',
             'message'
         ]);
         $response->seeStatusCode(200);
     }
+    public function testGetTeams()
 
-
+    {
+        $response = $this->json('GET', '/teams/');
+        $response->seeJsonStructure([
+            'status',
+            'message',
+            'teams'
+        ]);
+        $response->seeStatusCode(200);
+    }
     public function testUpdateTeam()
     {
+        $user = self::$created_user;
+        $token = $user->token;
         $team = self::$created_team;
         $id = $team->id;
-        $response = $this->json('PUT', '/team/'.$id, [
+        $response = $this->json('PUT', '/teams/'.$id, [
             'title' => 'asasas',
-        ]);
+        ],['token' => $token]);
         $response->seeJsonStructure([
             'status',
             'message'
         ]);
         $response->seeStatusCode(200);
     }
-
     public function testAddUsersToTeam($membership = null){
         $date = date_create();
-        $response = $this->json('POST', '/user', [
+        $response = $this->json('POST', '/users', [
             'name' => 'new'.date_timestamp_get($date),
             'mail' => date_timestamp_get($date).'@mail.ru'
         ]);
-        $result=$response->response->getContent();
+        $result = $response->response->getContent();
         $json = json_decode($result);
         if($membership == 'owner'){
              $json->user = $this->owner ;
@@ -141,10 +158,10 @@ class ExampleTest extends TestCase
         $member_id = $member['id'];
         $response = $this->json('POST', '/add_team_member/user/'.$member_id.'/team/'.$team_id,[],['token' => $token]);
         $response->seeJsonStructure([
-            'message'
+            'message',
         ]);
-    }
 
+    }
     public function testAddTeamOwner()
     {
         $user= self::$created_user;
@@ -159,7 +176,7 @@ class ExampleTest extends TestCase
             'message'
         ]);
     }
-
+//
     public function testDeleteTeamMember()
     {
         $user= self::$created_user;
@@ -174,7 +191,7 @@ class ExampleTest extends TestCase
         ]);
 
     }
-
+//
     public function testDeleteTeamOwner()
     {
         $user= self::$created_user;
@@ -188,14 +205,13 @@ class ExampleTest extends TestCase
             'message'
         ]);
     }
-
+//
     public function testDeleteTeam()
     {
         $team = self::$created_team;
         $team_id = $team->id;
-        $response = $this->json('DELETE', '/team/'.$team_id);
+        $response = $this->json('DELETE', '/teams/'.$team_id);
         $response->seeJsonStructure([
-            'status',
             'message'
         ]);
     }
@@ -203,14 +219,13 @@ class ExampleTest extends TestCase
     {
         $user = self::$created_user;
         $user_id = $user->id;
-        $response = $this->json('DELETE', '/user/'.$user_id);
+        $response = $this->json('DELETE', '/users/'.$user_id);
         $response->seeJsonStructure([
-            'status',
             'message'
         ]);
     }
-
-        public function testResetDb(){
+//
+    public function testResetDb(){
             Artisan::call('migrate:reset');
             $this->assertTrue(true);
         }
