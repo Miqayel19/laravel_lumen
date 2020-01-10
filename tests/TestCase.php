@@ -12,11 +12,11 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      */
     public function createApplication()
     {
-        return  require __DIR__ . '/../bootstrap/app.php';
+        return require __DIR__ . '/../bootstrap/app.php';
 
     }
 
-    public function setUp():void
+    public function setUp(): void
     {
         parent::setUp();
         $this->artisanMigrateRefresh();
@@ -28,14 +28,6 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
         Artisan::call('migrate');
         Artisan::call('db:seed');
     }
-
-
-
-
-
-
-
-
 
 
 }

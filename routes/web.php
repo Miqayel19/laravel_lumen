@@ -15,15 +15,17 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post('user','UserController@add');
-$router->get('user/{id}','UserController@show');
-$router->put('user/{id}','UserController@update');
-$router->delete('user/{id}','UserController@delete');
+$router->post('users','UserController@add');
+$router->get('users/{id}','UserController@index');
+$router->get('users','UserController@show');
+$router->put('users/{id}','UserController@update');
+$router->delete('users/{id}','UserController@delete');
 
-$router->post('team','TeamController@add');
-$router->get('team/{id}','TeamController@show');
-$router->put('team/{id}','TeamController@update');
-$router->delete('team/{id}','TeamController@delete');
+$router->post('teams','TeamController@add');
+$router->get('teams/{id}','TeamController@index');
+$router->get('teams','TeamController@show');
+$router->put('teams/{id}','TeamController@update');
+$router->delete('teams/{id}','TeamController@delete');
 
 
 $router->post('add_team_member/user/{member_id}/team/{team_id}','TeamController@addTeamMember');
